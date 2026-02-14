@@ -36,7 +36,7 @@ export const DATA = {
   ],
   "players": [
     // Tigres FC Players
-    { "id": "p1", "nombre": "Luis Perez", "edad": 23, "posicion": "Alero", "equipoId": "t1", "puntos": 15, "rebotes": 6, "asistencias": 3, "faltas": 2 },
+    { "id": "p1", "nombre": "Richard Malca", "edad": 43, "posicion": "Alero", "equipoId": "t1", "puntos": 15, "rebotes": 6, "asistencias": 3, "faltas": 2 },
     { "id": "p3", "nombre": "Carlos Gomez", "edad": 25, "posicion": "Ala-Pívot", "equipoId": "t1", "puntos": 8, "rebotes": 9, "asistencias": 2, "faltas": 3 },
     { "id": "p4", "nombre": "Juan Diaz", "edad": 22, "posicion": "Base", "equipoId": "t1", "puntos": 12, "rebotes": 3, "asistencias": 7, "faltas": 1 },
     { "id": "p5", "nombre": "Pedro Martinez", "edad": 28, "posicion": "Pívot", "equipoId": "t1", "puntos": 10, "rebotes": 11, "asistencias": 1, "faltas": 4 },
