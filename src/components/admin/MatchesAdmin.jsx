@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { calculateStandings } from '../../utils'
 
 const EMPTY_FORM = { fecha: '', horario: '', ubicacion: '', equipoA: '', equipoB: '', puntosA: '', puntosB: '', estado: 'proximo' }
 
@@ -24,6 +25,44 @@ export default function MatchesAdmin({ data, onSave }) {
       // Adding new match
       const newMatch = { ...matchData, id: 'm' + Date.now() }
       nextMatches = [newMatch, ...matches]
+    }
+
+    // Lógica para generar automáticamene Final y Tercer Puesto
+    const regularMatches = nextMatches.filter(m => !m.tipo);
+    const allFinished = regularMatches.every(m => m.estado === 'finalizado');
+    const hasFinals = nextMatches.some(m => m.tipo === 'final');
+
+    if (allFinished && !hasFinals) {
+      const standings = calculateStandings(data.teams, nextMatches);
+      if (standings.length >= 4) {
+        const thirdPlaceMatch = {
+          id: 'm_third',
+          fecha: form.fecha, // Usar la última fecha ingresada como referencia
+          horario: '11:00',
+          ubicacion: form.ubicacion || 'Por definir',
+          equipoA: standings[2].id, // 3ro
+          equipoB: standings[3].id, // 4to
+          puntosA: null,
+          puntosB: null,
+          estado: 'proximo',
+          tipo: 'tercer_puesto'
+        };
+
+        const finalMatch = {
+          id: 'm_final',
+          fecha: form.fecha,
+          horario: '12:00',
+          ubicacion: form.ubicacion || 'Por definir',
+          equipoA: standings[0].id, // 1ro
+          equipoB: standings[1].id, // 2do
+          puntosA: null,
+          puntosB: null,
+          estado: 'proximo',
+          tipo: 'final'
+        };
+
+        nextMatches = [...nextMatches, thirdPlaceMatch, finalMatch];
+      }
     }
 
     const next = { ...data, matches: nextMatches }

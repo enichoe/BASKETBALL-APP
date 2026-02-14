@@ -1,48 +1,7 @@
 import React from 'react'
+import { calculateStandings } from '../utils'
 
 const getTeam = (id, teams) => teams.find(t => t.id === id)
-
-const calculateStandings = (teams, matches) => {
-  const standings = teams.map(team => ({
-    ...team,
-    pj: 0,
-    g: 0,
-    p: 0,
-    pf: 0,
-    pc: 0,
-    dif: 0,
-    pts: 0,
-  }));
-
-  matches.filter(m => m.estado === 'finalizado').forEach(match => {
-    const teamA = standings.find(t => t.id === match.equipoA);
-    const teamB = standings.find(t => t.id === match.equipoB);
-
-    if (teamA && teamB) {
-      teamA.pj += 1;
-      teamB.pj += 1;
-      teamA.pf += match.puntosA;
-      teamB.pf += match.puntosB;
-      teamA.pc += match.puntosB;
-      teamB.pc += match.puntosA;
-      teamA.dif = teamA.pf - teamA.pc;
-      teamB.dif = teamB.pf - teamB.pc;
-
-      // En basketball NO hay empates, siempre hay ganador
-      if (match.puntosA > match.puntosB) {
-        teamA.g += 1;
-        teamB.p += 1;
-        teamA.pts += 2; // Basketball: victoria = 2 puntos
-      } else {
-        teamB.g += 1;
-        teamA.p += 1;
-        teamB.pts += 2; // Basketball: victoria = 2 puntos
-      }
-    }
-  });
-
-  return standings.sort((a, b) => b.pts - a.pts || b.dif - a.dif);
-};
 
 
 
@@ -57,9 +16,13 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
   // Un solo grupo con todos los equipos
   const standings = calculateStandings(teams, matches);
 
-  // Partidos finales (basados en la clasificación)
+  // Partidos finales (preferir los que están en la data)
   const finalMatch = matches.find(m => m.tipo === 'final');
   const thirdPlaceMatch = matches.find(m => m.tipo === 'tercer_puesto');
+
+  // Si no existen en la data, usamos los calculados al vuelo (fallback para UI consistente)
+  const finalTeams = [standings[0], standings[1]].filter(Boolean);
+  const thirdPlaceTeams = [standings[2], standings[3]].filter(Boolean);
 
   // Resultados finales (solo si los partidos están finalizados)
   let champion = null;
@@ -153,7 +116,7 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
 
           {/* Próximos Juegos - Movido aquí */}
           <section className='card transform hover:scale-105 transition-transform duration-300'>
-            <h2 className='text-2xl font-semibold mb-4'>Próximos Juegos 🏀</h2>
+            <h2 className='text-2xl font-semibold mb-4'>Próximos Partidos 🏀</h2>
             <div className='divide-y divide-gray-600'>
               {upcomingMatches.map(m => {
                 const teamA = getTeam(m.equipoA, teams);
@@ -176,7 +139,7 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
 
           {/* Finished Matches */}
           <section>
-            <h2 className='text-2xl font-semibold mb-4'>Partidos Finalizados</h2>
+            <h2 className='text-2xl font-semibold mb-4'>Partidos Finalizados 🏀</h2>
             <div className='space-y-4'>
               {matches.filter(m => m.estado === 'finalizado').map(m => {
                 const teamA = getTeam(m.equipoA, teams);
@@ -202,31 +165,62 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
 
           {/* Partidos Finales */}
           <section className='card transform hover:scale-105 transition-transform duration-300 mt-8'>
-            <h2 className='text-2xl font-semibold mb-4'>Partidos Finales</h2>
+            <h2 className='text-2xl font-semibold mb-4'>Partidos Finales 🏀</h2>
             <div className='divide-y divide-gray-600'>
-              {/* FINAL - 1º vs 2º */}
-              {standings[0] && standings[1] && (
-                <div className='p-4 first:rounded-t-lg'>
-                  <h3 className='text-center font-bold text-lg mb-3 text-green-300'>🏆 FINAL</h3>
-                  <div className='flex items-center justify-center gap-4'>
-                    <div className='font-semibold text-base flex-1 text-right'>{standings[0].nombre}</div>
-                    <div className='font-bold text-xl text-green-400'>VS</div>
-                    <div className='font-semibold text-base flex-1 text-left'>{standings[1].nombre}</div>
-                  </div>
-                </div>
-              )}
+              <section className='card transform hover:scale-105 transition-transform duration-300 mt-8'>
+                <h2 className='text-2xl font-semibold mb-4'>Partidos Finales</h2>
+                <div className='divide-y divide-gray-600'>
+                  {/* FINAL */}
+                  {(finalMatch || (finalTeams[0] && finalTeams[1])) && (
+                    <div className='p-4 first:rounded-t-lg'>
+                      <h3 className='text-center font-bold text-lg mb-3 text-green-300'>🏆 FINAL 🏀</h3>
+                      <div className='flex items-center justify-center gap-4'>
+                        <div className='font-semibold text-base flex-1 text-right'>
+                          {finalMatch ? getTeam(finalMatch.equipoA, teams)?.nombre : finalTeams[0].nombre}
+                        </div>
+                        <div className='text-xl font-bold flex flex-col items-center'>
+                          {finalMatch && finalMatch.estado === 'finalizado' ? (
+                            <span className='text-white'>{finalMatch.puntosA} - {finalMatch.puntosB}</span>
+                          ) : (
+                            <span className='text-green-400'>VS</span>
+                          )}
+                          {finalMatch && finalMatch.horario && (
+                            <span className='text-[10px] text-gray-400 font-normal'>{finalMatch.horario}</span>
+                          )}
+                        </div>
+                        <div className='font-semibold text-base flex-1 text-left'>
+                          {finalMatch ? getTeam(finalMatch.equipoB, teams)?.nombre : finalTeams[1].nombre}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-              {/* TERCER PUESTO - 3º vs 4º */}
-              {standings[2] && standings[3] && (
-                <div className='p-4 last:rounded-b-lg'>
-                  <h3 className='text-center font-bold text-lg mb-3 text-yellow-300'>🥉 TERCER PUESTO</h3>
-                  <div className='flex items-center justify-center gap-4'>
-                    <div className='font-semibold text-base flex-1 text-right'>{standings[2].nombre}</div>
-                    <div className='font-bold text-xl text-yellow-400'>VS</div>
-                    <div className='font-semibold text-base flex-1 text-left'>{standings[3].nombre}</div>
-                  </div>
+                  {/* TERCER PUESTO */}
+                  {(thirdPlaceMatch || (thirdPlaceTeams[0] && thirdPlaceTeams[1])) && (
+                    <div className='p-4 last:rounded-b-lg'>
+                      <h3 className='text-center font-bold text-lg mb-3 text-yellow-300'>🥉 TERCER PUESTO 🏀</h3>
+                      <div className='flex items-center justify-center gap-4'>
+                        <div className='font-semibold text-base flex-1 text-right'>
+                          {thirdPlaceMatch ? getTeam(thirdPlaceMatch.equipoA, teams)?.nombre : thirdPlaceTeams[0].nombre}
+                        </div>
+                        <div className='text-xl font-bold flex flex-col items-center'>
+                          {thirdPlaceMatch && thirdPlaceMatch.estado === 'finalizado' ? (
+                            <span className='text-white'>{thirdPlaceMatch.puntosA} - {thirdPlaceMatch.puntosB}</span>
+                          ) : (
+                            <span className='text-yellow-400'>VS</span>
+                          )}
+                          {thirdPlaceMatch && thirdPlaceMatch.horario && (
+                            <span className='text-[10px] text-gray-400 font-normal'>{thirdPlaceMatch.horario}</span>
+                          )}
+                        </div>
+                        <div className='font-semibold text-base flex-1 text-left'>
+                          {thirdPlaceMatch ? getTeam(thirdPlaceMatch.equipoB, teams)?.nombre : thirdPlaceTeams[1].nombre}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </section>
             </div>
           </section>
 
