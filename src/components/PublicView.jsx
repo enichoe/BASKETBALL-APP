@@ -49,7 +49,11 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
   return (
     <div className='p-4 md:p-6 min-h-screen bg-gray-900 text-gray-100'>
       <header className='text-center mb-8'>
-        <img src='/assets/logos/logo.jpg' alt='Logo del Torneo' className='h-24 md:h-32 mx-auto mb-4' />
+        <img
+          src='/assets/logos/logo.jpg'
+          alt='Logo del Torneo'
+          className='h-32 md:h-48 w-32 md:w-48 rounded-full border-4 border-indigo-500/50 object-cover shadow-2xl mx-auto mb-6 transform hover:scale-110 transition-transform duration-500'
+        />
         <h1 className='text-3xl md:text-4xl font-bold text-indigo-500 mb-2'>
           1er TORNEO BASKETBALL MIXTO 🏀
         </h1>
