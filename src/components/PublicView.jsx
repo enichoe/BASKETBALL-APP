@@ -66,19 +66,19 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
           {/* Standings */}
           <section>
             <h2 className='text-2xl font-semibold mb-4'>Tabla de Posiciones</h2>
-            <div className='card mb-6 transform hover:scale-105 transition-transform duration-300'>
+            <div className='card mb-6 overflow-hidden border-0 bg-slate-800/50 backdrop-blur-sm shadow-2xl rounded-xl'>
               <div className='overflow-x-auto'>
-                <table className='w-full border-collapse border border-gray-600 table-fixed'>
-                  <thead className='bg-purple-600 text-gray-100'>
-                    <tr className='text-[10px] md:text-sm uppercase tracking-tighter'>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-left w-[28%] md:w-auto'>Equipo</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[10%]'>PJ</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[10%]'>G</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[10%]'>P</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[10%]'>PF</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[10%]'>PC</th>
-                      <th className='p-1 md:p-3 border-r border-gray-700 text-center w-[11%]'>DIF</th>
-                      <th className='p-1 md:p-3 text-center w-[11%]'>PTS</th>
+                <table className='w-full border-collapse table-fixed'>
+                  <thead>
+                    <tr className='bg-gradient-to-r from-indigo-700 to-indigo-900 text-white text-[10px] md:text-sm uppercase tracking-wider font-bold'>
+                      <th className='p-3 md:p-4 text-left w-[35%] md:w-auto'>Equipo</th>
+                      <th className='p-2 md:p-4 text-center w-[10%]'>PJ</th>
+                      <th className='p-2 md:p-4 text-center w-[10%]'>G</th>
+                      <th className='p-2 md:p-4 text-center w-[10%]'>P</th>
+                      <th className='p-2 md:p-4 text-center w-[10%]'>PF</th>
+                      <th className='p-2 md:p-4 text-center w-[10%]'>PC</th>
+                      <th className='p-2 md:p-4 text-center w-[11%]'>DIF</th>
+                      <th className='p-3 md:p-4 text-center w-[12%]'>PTS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -86,25 +86,38 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
                       const isFinalQualified = index < 2;
                       const isThirdPlaceQualified = index >= 2 && index < 4;
 
-                      let bgColor = index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700';
-                      if (isFinalQualified) bgColor = 'bg-green-600/40';
-                      else if (isThirdPlaceQualified) bgColor = 'bg-yellow-600/40';
+                      let rowStyle = 'bg-slate-800/40 hover:bg-slate-700/60';
+                      let borderStyle = 'border-l-4 border-transparent';
+                      let textWeight = 'font-normal';
+                      let pointsColor = 'text-white';
+
+                      if (isFinalQualified) {
+                        rowStyle = 'bg-indigo-900/40 hover:bg-indigo-800/50';
+                        borderStyle = 'border-l-4 border-amber-500';
+                        textWeight = 'font-semibold';
+                        pointsColor = 'text-amber-400';
+                      } else if (isThirdPlaceQualified) {
+                        rowStyle = 'bg-slate-700/40 hover:bg-slate-600/50';
+                        borderStyle = 'border-l-4 border-indigo-400';
+                      }
 
                       return (
-                        <tr key={t.id} className={`border-b border-gray-700 ${bgColor} hover:bg-indigo-700 text-[11px] md:text-base`}>
-                          <td className='p-1 md:p-3 border-r border-gray-700'>
-                            <div className='flex items-center gap-1 leading-tight'>
-                              <span className='font-bold text-indigo-400 mr-0.5'>{index + 1}</span>
-                              <span className='font-semibold break-words'>{t.nombre}</span>
+                        <tr key={t.id} className={`border-b border-slate-700/50 transition-colors ${rowStyle} ${textWeight} text-[11px] md:text-base`}>
+                          <td className={`p-2 md:p-4 ${borderStyle}`}>
+                            <div className='flex items-center gap-2'>
+                              <span className={`flex items-center justify-center w-6 h-6 rounded-full text-[10px] ${isFinalQualified ? 'bg-amber-500 text-black font-black shadow-lg shadow-amber-500/20' : 'bg-slate-700 text-gray-300'}`}>
+                                {index + 1}
+                              </span>
+                              <span className='truncate'>{t.nombre}</span>
                             </div>
                           </td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.pj}</td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.g}</td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.p}</td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.pf}</td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.pc}</td>
-                          <td className='p-1 md:p-3 border-r border-gray-700 text-center font-medium'>{t.dif}</td>
-                          <td className='p-1 md:p-3 font-bold text-center'>{t.pts}</td>
+                          <td className='p-2 md:p-4 text-center text-gray-300'>{t.pj}</td>
+                          <td className='p-2 md:p-4 text-center text-green-400'>{t.g}</td>
+                          <td className='p-2 md:p-4 text-center text-red-400'>{t.p}</td>
+                          <td className='p-2 md:p-4 text-center text-gray-400'>{t.pf}</td>
+                          <td className='p-2 md:p-4 text-center text-gray-400'>{t.pc}</td>
+                          <td className='p-2 md:p-4 text-center font-mono'>{t.dif > 0 ? `+${t.dif}` : t.dif}</td>
+                          <td className={`p-2 md:p-4 text-center text-lg font-black ${pointsColor}`}>{t.pts}</td>
                         </tr>
                       )
                     })}
@@ -224,40 +237,65 @@ export default function PublicView({ data, onSelectTeam, onSelectMatch }) {
             </div>
           </section>
 
-          {/* Resultados Finales - Solo se muestra cuando hay resultados */}
+          {/* Resultados Finales */}
           {(champion || thirdPlace) && (
-            <section className='card transform hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border-2 border-yellow-400 mt-8'>
-              <h2 className='text-2xl font-semibold mb-4 text-center text-yellow-300'>✨ Resultados Finales ✨</h2>
-              <div className='space-y-4'>
+            <section className='mt-12 overflow-hidden rounded-2xl bg-gradient-to-b from-indigo-900 to-black border border-indigo-500/30 shadow-2xl'>
+              <div className='bg-indigo-600/20 py-6 px-4 text-center border-b border-indigo-500/20'>
+                <h2 className='text-3xl md:text-5xl font-black text-amber-400 uppercase tracking-widest drop-shadow-md'>
+                  ✨ Cuadro de Honor ✨
+                </h2>
+              </div>
+
+              <div className='p-6 md:p-10 space-y-8'>
                 {/* CAMPEÓN */}
                 {champion && (
-                  <div className='p-4 rounded-lg bg-yellow-500/20 border-2 border-yellow-400'>
-                    <h3 className='text-center font-bold text-2xl mb-2 text-yellow-300'>🏆 CAMPEÓN</h3>
-                    <div className='flex items-center justify-center'>
-                      <span className='font-bold text-2xl'>{champion.nombre}</span>
+                  <div className='flex flex-col items-center gap-6'>
+                    <div className='relative group w-full max-w-2xl'>
+                      {/* Aura effect */}
+                      <div className='absolute -inset-1 bg-gradient-to-r from-amber-600 to-yellow-400 rounded-lg blur opacity-40 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse'></div>
+
+                      <div className='relative bg-black rounded-lg overflow-hidden border-4 border-amber-500'>
+                        <div className='p-2 bg-amber-500 text-black text-center font-black text-xl uppercase tracking-tighter'>
+                          🏆 CAMPEÓN 2026 🏆
+                        </div>
+
+                        {finalMatch?.fotoCampeon ? (
+                          <div className='aspect-video overflow-hidden'>
+                            <img src={finalMatch.fotoCampeon} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt='Foto del Campeón' />
+                          </div>
+                        ) : (
+                          <div className='h-48 flex items-center justify-center bg-slate-900/50 italic text-gray-400'>
+                            Foto oficial pendiente
+                          </div>
+                        )}
+
+                        <div className='p-6 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col items-center gap-2'>
+                          <span className='text-3xl md:text-5xl font-black text-white text-center drop-shadow-lg'>{champion.nombre}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* SUBCAMPEÓN */}
-                {runnerUp && (
-                  <div className='p-4 rounded-lg bg-gray-600/30 border-2 border-gray-400'>
-                    <h3 className='text-center font-bold text-xl mb-2 text-gray-300'>🥈 SUBCAMPEÓN</h3>
-                    <div className='flex items-center justify-center'>
-                      <span className='font-semibold text-xl'>{runnerUp.nombre}</span>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  {/* SUBCAMPEÓN */}
+                  {runnerUp && (
+                    <div className='p-6 rounded-xl bg-slate-800/50 border-2 border-slate-400/30 flex flex-col items-center gap-3'>
+                      <div className='text-4xl font-bold'>🥈</div>
+                      <h3 className='text-gray-400 font-bold uppercase text-sm tracking-widest'>Subcampeón</h3>
+                      <span className='font-bold text-2xl text-white text-center'>{runnerUp.nombre}</span>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* TERCER PUESTO */}
-                {thirdPlace && (
-                  <div className='p-4 rounded-lg bg-orange-700/30 border-2 border-orange-500'>
-                    <h3 className='text-center font-bold text-xl mb-2 text-orange-300'>🥉 TERCER PUESTO</h3>
-                    <div className='flex items-center justify-center'>
-                      <span className='font-semibold text-xl'>{thirdPlace.nombre}</span>
+                  {/* TERCER PUESTO */}
+                  {thirdPlace && (
+                    <div className='p-6 rounded-xl bg-slate-800/50 border-2 border-amber-900/30 flex flex-col items-center gap-3'>
+                      <div className='text-4xl font-bold'>🥉</div>
+                      <h3 className='text-amber-700 font-bold uppercase text-sm tracking-widest'>Tercer Puesto</h3>
+                      <span className='font-bold text-2xl text-white text-center'>{thirdPlace.nombre}</span>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </section>
           )}

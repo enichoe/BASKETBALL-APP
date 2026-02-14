@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { calculateStandings } from '../../utils'
 
-const EMPTY_FORM = { fecha: '', horario: '', ubicacion: '', equipoA: '', equipoB: '', puntosA: '', puntosB: '', estado: 'proximo' }
+const EMPTY_FORM = { fecha: '', horario: '', ubicacion: '', equipoA: '', equipoB: '', puntosA: '', puntosB: '', estado: 'proximo', fotoCampeon: '' }
 
 export default function MatchesAdmin({ data, onSave }) {
   const [matches, setMatches] = useState(data.matches)
@@ -178,6 +178,15 @@ export default function MatchesAdmin({ data, onSave }) {
             <option value="proximo">Próximo</option>
             <option value="finalizado">Finalizado</option>
           </select>
+
+          {form.tipo === 'final' && (
+            <input
+              className="input border-gray-300 focus:ring-2 focus:ring-blue-400 col-span-2 md:col-span-4"
+              placeholder="URL de la Foto del Campeón"
+              value={form.fotoCampeon || ''}
+              onChange={e => setForm({ ...form, fotoCampeon: e.target.value })}
+            />
+          )}
         </div>
 
         <div className="flex gap-3">
