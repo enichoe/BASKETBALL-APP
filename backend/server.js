@@ -22,9 +22,14 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://enichoe_db_user:alianzalima@ligaapppro.hmybvyc.mongodb.net/basket_league_app";
+
+mongoose.connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+    console.log("Using URI:", MONGO_URI);
+  });
 
 const groupRoutes = require("./routes/groupRoutes");
 const teamRoutes = require("./routes/teamRoutes");
