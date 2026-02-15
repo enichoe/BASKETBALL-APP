@@ -240,7 +240,7 @@ export default function PlayersAdmin({ data, onSave }) {
               return (
                 <div
                   key={p.id}
-                  className="bg-gray-800/70 p-4 rounded-xl flex flex-wrap justify-between items-center border border-gray-700 hover:bg-gray-800 transition"
+                  className="bg-gray-800/70 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center border border-gray-700 hover:bg-gray-800 transition gap-4"
                 >
                   <div className="flex items-center gap-4">
                     <img
@@ -256,16 +256,16 @@ export default function PlayersAdmin({ data, onSave }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm">
-                    <span>🏀 {p.puntos} pts</span>
-                    <span>📊 {p.rebotes} reb</span>
-                    <span>🎯 {p.asistencias} ast</span>
-                    <span className="text-yellow-400">⚠️ {p.faltas} faltas</span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-300">
+                    <span className="flex items-center gap-1">🏀 {p.puntos} <span className="hidden sm:inline">pts</span></span>
+                    <span className="flex items-center gap-1">📊 {p.rebotes} <span className="hidden sm:inline">reb</span></span>
+                    <span className="flex items-center gap-1">🎯 {p.asistencias} <span className="hidden sm:inline">ast</span></span>
+                    <span className="text-yellow-400">⚠️ {p.faltas} <span className="hidden sm:inline">faltas</span></span>
                     {p.lesionado && (
-                      <span className="text-red-400 font-semibold">Lesionado</span>
+                      <span className="text-red-400 font-semibold px-2 py-0.5 bg-red-400/10 rounded text-xs">Lesionado</span>
                     )}
                     {p.suspendido && (
-                      <span className="text-orange-400 font-semibold">Suspendido</span>
+                      <span className="text-orange-400 font-semibold px-2 py-0.5 bg-orange-400/10 rounded text-xs">Suspendido</span>
                     )}
                   </div>
 

@@ -220,21 +220,23 @@ export default function MatchesAdmin({ data, onSave }) {
               className="card input col-span-2 text-white bg-gray-900 border-gray-700  transition-all duration-200 flex flex-col sm:flex-row justify-between items-center gap-3 p-4 rounded-lg shadow-sm"
             >
               <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2 font-bold text-700">
-                  <img src={teamA.logo} className="w-10 h-10 object-contain" /> {teamA.nombre}
+                <div className="flex items-center gap-3 font-bold text-slate-200 flex-1">
+                  <img src={teamA.logo} className="w-10 h-10 object-contain rounded-lg bg-slate-800 p-1 border border-slate-700 hidden md:block" />
+                  <span className="leading-tight">{teamA.nombre}</span>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center px-1">
                   {m.estado === 'finalizado' ? (
-                    <div className="text-2xl font-bold text-900">{m.puntosA} - {m.puntosB}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-slate-100">{m.puntosA} - {m.puntosB}</div>
                   ) : (
-                    <div className="text-lg font-semibold text-blue-700">{m.horario}</div>
+                    <div className="text-base sm:text-lg font-semibold text-blue-400">{m.horario}</div>
                   )}
-                  <div className="text-xs text-gray-300">{m.fecha} - {m.ubicacion}</div>
+                  <div className="text-[10px] sm:text-xs text-gray-400">{m.fecha}</div>
                 </div>
 
-                <div className="flex items-center gap-2 font-bold text-700 text-right">
-                  {teamB.nombre} <img src={teamB.logo} className="w-10 h-10 object-contain" />
+                <div className="flex items-center gap-3 font-bold text-slate-200 text-right flex-1 justify-end">
+                  <span className="leading-tight">{teamB.nombre}</span>
+                  <img src={teamB.logo} className="w-10 h-10 object-contain rounded-lg bg-slate-800 p-1 border border-slate-700 hidden md:block" />
                 </div>
               </div>
 

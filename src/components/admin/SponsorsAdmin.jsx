@@ -124,48 +124,60 @@ export default function SponsorsAdmin({ data, onSave }) {
       </div>
 
       <div>
-        <h3 className='text-xl font-semibold mb-4'>Lista de Auspiciadores</h3>
-        <div className='overflow-x-auto'> 
-          <table className='min-w-full divide-y divide-gray-700'>
-            <thead className='bg-slate-700'>
-              <tr>
-                <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>Logo</th>
-                <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>Nombre</th>
-                <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>Link</th>
-                <th scope='col' className='relative px-6 py-3'><span className='sr-only'>Acciones</span></th>
-              </tr>
-            </thead>
-            <tbody className='bg-slate-800 divide-y divide-gray-700'>
-              {sponsors.map((sponsor) => (
-                <tr key={sponsor.id} className='hover:bg-slate-700'>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <img src={sponsor.logo} alt={sponsor.nombre} className='h-10 w-10 object-contain' />
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-white'>{sponsor.nombre}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                    <a href={sponsor.link} target='_blank' rel='noopener noreferrer' className='text-emerald-400 hover:text-emerald-300'>
-                      {sponsor.link ? new URL(sponsor.link).hostname : 'N/A'}
-                    </a>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
-                    <button
-                      onClick={() => handleEditClick(sponsor)}
-                      className='text-indigo-400 hover:text-indigo-300 mr-4'
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSponsor(sponsor.id)}
-                      className='text-red-400 hover:text-red-300'
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h3 className='text-xl font-semibold mb-6 flex items-center gap-2'>
+          <span>📋 Lista de Auspiciadores</span>
+          <span className="text-sm font-normal text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded-full">{sponsors.length}</span>
+        </h3>
+
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {sponsors.map((sponsor) => (
+            <div key={sponsor.id} className='bg-slate-700/40 border border-slate-700 rounded-xl p-4 hover:bg-slate-700/60 transition-all group'>
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-white rounded-lg p-2 flex items-center justify-center border border-slate-600 shadow-sm overflow-hidden">
+                  <img src={sponsor.logo} alt={sponsor.nombre} className='max-w-full max-h-full object-contain' />
+                </div>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleEditClick(sponsor)}
+                    className='p-2 text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition-colors'
+                    title="Editar"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSponsor(sponsor.id)}
+                    className='p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors'
+                    title="Eliminar"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <h4 className='font-bold text-lg text-white mb-1'>{sponsor.nombre}</h4>
+                {sponsor.link ? (
+                  <a
+                    href={sponsor.link}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-sm text-emerald-400 hover:underline flex items-center gap-1'
+                  >
+                    <span>🔗</span> {new URL(sponsor.link).hostname}
+                  </a>
+                ) : (
+                  <span className="text-sm text-slate-500 italic">Sin enlace</span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
+
+        {sponsors.length === 0 && (
+          <div className="text-center py-12 bg-slate-800/50 rounded-xl border border-dashed border-slate-700">
+            <p className="text-slate-400 italic">No hay auspiciadores registrados aún.</p>
+          </div>
+        )}
       </div>
     </div>
   );
