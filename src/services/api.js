@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
+if (API_URL.endsWith('/') || API_URL.endsWith('.')) API_URL = API_URL.slice(0, -1);
+if (API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1); // Handle both dot and slash
 
 const handleResponse = async (response) => {
   const contentType = response.headers.get("content-type");
