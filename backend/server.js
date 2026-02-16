@@ -27,7 +27,7 @@ let MONGO_URI = (process.env.MONGODB_URI || "").trim();
 // Si la URI no empieza con el esquema correcto, usamos el fallback
 if (!MONGO_URI.startsWith("mongodb://") && !MONGO_URI.startsWith("mongodb+srv://")) {
   console.log("MONGODB_URI no válida o ausente, usando base de datos por defecto.");
-  MONGO_URI = "mongodb+srv://enichoe_db_user:alianzalima@ligaapppro.hmybvyc.mongodb.net/basket_league_app";
+  MONGO_URI = "mongodb+srv://programadorwebernesto_db_user:EQsLL21GY6cebQB0@cluster0.v7wrefs.mongodb.net/basket_league_app?appName=Cluster0";
 }
 
 mongoose.connect(MONGO_URI)
