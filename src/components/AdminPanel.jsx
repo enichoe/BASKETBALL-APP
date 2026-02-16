@@ -6,7 +6,7 @@ import SponsorsAdmin from './admin/SponsorsAdmin'
 
 export default function AdminPanel({ data, updateData, onLogout }) {
   const [tab, setTab] = useState('teams')
-  const save = (next) => updateData(next)
+  const save = () => updateData()
   return (
     <div className='flex flex-col min-h-screen md:flex-row bg-slate-950 text-slate-100'>
       <aside className='w-full p-6 bg-slate-900 border-b border-slate-800 md:w-64 md:border-r md:border-b-0 flex flex-col'>

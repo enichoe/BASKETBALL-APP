@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { apiService } from '../../services/api'
 export default function TeamsAdmin({ data, onSave }) {
   const [teams, setTeams] = useState(data.teams)
   const [name, setName] = useState('')
@@ -18,20 +19,28 @@ export default function TeamsAdmin({ data, onSave }) {
     }
   }
 
-  const add = () => {
+  const add = async () => {
     if (!name || !grupoId) return
-    const t = { id: 't' + Date.now(), nombre: name, logo: logo || 'assets/logos/default.svg', color: color, grupoId: grupoId }
-    const next = { ...data, teams: [t, ...teams] }
-    setTeams([t, ...teams]); onSave(next)
-    setName('')
-    setColor('#000000')
-    setLogo('')
+    try {
+      await apiService.createTeam({ nombre: name, logo: logo || 'assets/logos/default.svg', color: color, grupoId: grupoId })
+      onSave() // Refresh data in App.jsx
+      setName('')
+      setColor('#000000')
+      setLogo('')
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
-  const remove = (id) => {
-    const nextTeams = teams.filter(x => x.id !== id)
-    const next = { ...data, teams: nextTeams }
-    setTeams(nextTeams); onSave(next)
+  const remove = async (id) => {
+    if (window.confirm('¿Eliminar equipo?')) {
+      try {
+        await apiService.deleteTeam(id)
+        onSave()
+      } catch (error) {
+        alert(error.message)
+      }
+    }
   }
 
   const startEdit = (team) => {

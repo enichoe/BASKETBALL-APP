@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { apiService } from '../../services/api'
 
 const EMPTY_FORM = { nombre: '', edad: '', talla: '', peso: '', posicion: 'Base', equipoId: '', foto: '', puntos: 0, rebotes: 0, asistencias: 0, faltas: 0, lesionado: false, suspendido: false }
 
@@ -24,33 +25,34 @@ export default function PlayersAdmin({ data, onSave }) {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.nombre || !form.equipoId) return
 
     const playerData = {
-      ...form,
+      nombre: form.nombre,
+      edad: Number(form.edad),
+      posicion: form.posicion,
+      equipo: form.equipoId, // API expects 'equipo'
+      image: form.foto || 'assets/players/default.svg',
       puntos: parseInt(form.puntos) || 0,
       rebotes: parseInt(form.rebotes) || 0,
       asistencias: parseInt(form.asistencias) || 0,
       faltas: parseInt(form.faltas) || 0,
-      lesionado: !!form.lesionado,
-      suspendido: !!form.suspendido,
-      foto: form.foto || 'assets/players/default.svg',
+      suspendido: !!form.suspendido
     }
 
-    let nextPlayers;
-    if (editingId) {
-      nextPlayers = players.map(p => p.id === editingId ? { ...playerData, id: editingId } : p)
-    } else {
-      const newPlayer = { ...playerData, id: 'p' + Date.now() }
-      nextPlayers = [newPlayer, ...players]
+    try {
+      if (editingId) {
+        await apiService.updatePlayer(editingId, playerData)
+      } else {
+        await apiService.createPlayer(playerData)
+      }
+      onSave()
+      setForm(EMPTY_FORM)
+      setEditingId(null)
+    } catch (error) {
+      alert(error.message)
     }
-
-    const next = { ...data, players: nextPlayers }
-    setPlayers(nextPlayers);
-    onSave(next)
-    setForm(EMPTY_FORM)
-    setEditingId(null)
   }
 
   const startEdit = (player) => {
@@ -63,10 +65,15 @@ export default function PlayersAdmin({ data, onSave }) {
     setEditingId(null)
   }
 
-  const remove = (id) => {
-    const nextPlayers = players.filter(x => x.id !== id)
-    const next = { ...data, players: nextPlayers }
-    setPlayers(nextPlayers); onSave(next)
+  const remove = async (id) => {
+    if (window.confirm('¿Eliminar jugador?')) {
+      try {
+        await apiService.deletePlayer(id)
+        onSave()
+      } catch (error) {
+        alert(error.message)
+      }
+    }
   }
 
   const getTeam = (id) => data.teams.find(t => t.id === id)

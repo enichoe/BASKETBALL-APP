@@ -7,12 +7,35 @@ import { SPONSORS } from './data/sponsors'
 import TeamDetail from './components/TeamDetail'
 import MatchDetail from './components/MatchDetail'
 import Footer from './components/Footer'
+import { apiService } from './services/api'
+import { useEffect } from 'react'
 
 export default function App() {
   const [view, setView] = useState('public') // 'public', 'login', 'admin'
-  const [data, setData] = useState({ ...DATA, sponsors: SPONSORS })
+  const [data, setData] = useState({ groups: [], teams: [], players: [], matches: [], sponsors: [] })
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [selectedMatch, setSelectedMatch] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [groups, teams, players, matches, sponsors] = await Promise.all([
+          apiService.getGroups(),
+          apiService.getTeams(),
+          apiService.getPlayers(),
+          apiService.getMatches(),
+          apiService.getSponsors()
+        ]);
+        setData({ groups, teams, players, matches, sponsors });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSelectTeam = (teamId) => {
     setSelectedTeam(teamId)
@@ -22,16 +45,34 @@ export default function App() {
     setSelectedMatch(matchId)
   }
 
-  const login = (user, pass) => {
-    if (user === 'admin' && pass === '1234') { setView('admin'); return true }
-    return false
+  const login = async (user, pass) => {
+    try {
+      await apiService.login(user, pass);
+      setView('admin');
+      return true;
+    } catch (error) {
+      alert(error.message);
+      return false;
+    }
   }
 
-  const logout = () => setView('public')
+  const logout = () => {
+    setView('public');
+  }
 
-  const updateData = (next) => {
-    console.log('data updated', next)
-    setData(next)
+  const updateData = async () => {
+    try {
+      const [groups, teams, players, matches, sponsors] = await Promise.all([
+        apiService.getGroups(),
+        apiService.getTeams(),
+        apiService.getPlayers(),
+        apiService.getMatches(),
+        apiService.getSponsors()
+      ]);
+      setData({ groups, teams, players, matches, sponsors });
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
   }
 
   const renderNav = () => {

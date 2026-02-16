@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { calculateStandings } from '../../utils'
+import { apiService } from '../../services/api'
 
 const EMPTY_FORM = { fecha: '', horario: '', ubicacion: '', equipoA: '', equipoB: '', puntosA: '', puntosB: '', estado: 'proximo', fotoCampeon: '' }
 
@@ -8,68 +9,32 @@ export default function MatchesAdmin({ data, onSave }) {
   const [form, setForm] = useState(EMPTY_FORM)
   const [editingId, setEditingId] = useState(null)
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.fecha || !form.equipoA || !form.equipoB) return
 
     const matchData = {
-      ...form,
+      fecha: form.fecha,
+      horario: form.horario,
+      ubicacion: form.ubicacion,
+      equipoA: form.equipoA,
+      equipoB: form.equipoB,
       puntosA: form.puntosA === '' ? null : parseInt(form.puntosA),
       puntosB: form.puntosB === '' ? null : parseInt(form.puntosB),
+      estado: form.estado,
     }
 
-    let nextMatches;
-    if (editingId) {
-      // Editing existing match
-      nextMatches = matches.map(m => m.id === editingId ? { ...matchData, id: editingId } : m)
-    } else {
-      // Adding new match
-      const newMatch = { ...matchData, id: 'm' + Date.now() }
-      nextMatches = [newMatch, ...matches]
-    }
-
-    // Lógica para generar automáticamene Final y Tercer Puesto
-    const regularMatches = nextMatches.filter(m => !m.tipo);
-    const allFinished = regularMatches.every(m => m.estado === 'finalizado');
-    const hasFinals = nextMatches.some(m => m.tipo === 'final');
-
-    if (allFinished && !hasFinals) {
-      const standings = calculateStandings(data.teams, nextMatches);
-      if (standings.length >= 4) {
-        const thirdPlaceMatch = {
-          id: 'm_third',
-          fecha: form.fecha, // Usar la última fecha ingresada como referencia
-          horario: '11:00',
-          ubicacion: form.ubicacion || 'Por definir',
-          equipoA: standings[2].id, // 3ro
-          equipoB: standings[3].id, // 4to
-          puntosA: null,
-          puntosB: null,
-          estado: 'proximo',
-          tipo: 'tercer_puesto'
-        };
-
-        const finalMatch = {
-          id: 'm_final',
-          fecha: form.fecha,
-          horario: '12:00',
-          ubicacion: form.ubicacion || 'Por definir',
-          equipoA: standings[0].id, // 1ro
-          equipoB: standings[1].id, // 2do
-          puntosA: null,
-          puntosB: null,
-          estado: 'proximo',
-          tipo: 'final'
-        };
-
-        nextMatches = [...nextMatches, thirdPlaceMatch, finalMatch];
+    try {
+      if (editingId) {
+        await apiService.updateMatch(editingId, matchData)
+      } else {
+        await apiService.createMatch(matchData)
       }
+      onSave()
+      setForm(EMPTY_FORM)
+      setEditingId(null)
+    } catch (error) {
+      alert(error.message)
     }
-
-    const next = { ...data, matches: nextMatches }
-    setMatches(nextMatches);
-    onSave(next)
-    setForm(EMPTY_FORM)
-    setEditingId(null)
   }
 
   const startEdit = (match) => {
@@ -86,10 +51,15 @@ export default function MatchesAdmin({ data, onSave }) {
     setEditingId(null)
   }
 
-  const remove = (id) => {
-    const nextMatches = matches.filter(x => x.id !== id)
-    const next = { ...data, matches: nextMatches }
-    setMatches(nextMatches); onSave(next)
+  const remove = async (id) => {
+    if (window.confirm('¿Eliminar partido?')) {
+      try {
+        await apiService.deleteMatch(id)
+        onSave()
+      } catch (error) {
+        alert(error.message)
+      }
+    }
   }
 
   const getTeam = (id) => data.teams.find(t => t.id === id)
