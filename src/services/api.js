@@ -1,11 +1,26 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const handleResponse = async (response) => {
+  const contentType = response.headers.get("content-type");
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Error en la petición');
+    let errorMessage = 'Error en la petición';
+    if (contentType && contentType.includes("application/json")) {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } else {
+      const text = await response.text();
+      console.error("Response not JSON:", text.substring(0, 100));
+      errorMessage = `Error ${response.status}: El servidor no devolvió JSON.`;
+    }
+    throw new Error(errorMessage);
   }
-  return response.json();
+  
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+  const text = await response.text();
+  console.error("Expected JSON but got:", text.substring(0, 100));
+  throw new Error("El servidor devolvió un formato inesperado (HTML en lugar de JSON). Verifica la URL de la API.");
 };
 
 export const apiService = {
