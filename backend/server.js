@@ -22,13 +22,20 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://enichoe_db_user:alianzalima@ligaapppro.hmybvyc.mongodb.net/basket_league_app";
+let MONGO_URI = (process.env.MONGODB_URI || "").trim();
+
+// Si la URI no empieza con el esquema correcto, usamos el fallback
+if (!MONGO_URI.startsWith("mongodb://") && !MONGO_URI.startsWith("mongodb+srv://")) {
+  console.log("MONGODB_URI no válida o ausente, usando base de datos por defecto.");
+  MONGO_URI = "mongodb+srv://enichoe_db_user:alianzalima@ligaapppro.hmybvyc.mongodb.net/basket_league_app";
+}
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => {
     console.error("MongoDB connection error:", err);
-    console.log("Using URI:", MONGO_URI);
+    // No imprimimos la URI completa por seguridad si tiene éxito, pero sí en error para depurar si el usuario la ve en logs privados
+    console.log("URI intentada (ofuscada):", MONGO_URI.substring(0, 20) + "...");
   });
 
 const groupRoutes = require("./routes/groupRoutes");
