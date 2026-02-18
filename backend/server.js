@@ -38,15 +38,17 @@ const matchRoutes = require("./routes/matchRoutes");
 const sponsorRoutes = require("./routes/sponsorRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-// Routes
-app.use("/api/groups", groupRoutes);
-app.use("/api/teams", teamRoutes);
-app.use("/api/players", playerRoutes);
-app.use("/api/matches", matchRoutes);
-app.use("/api/sponsors", sponsorRoutes);
-app.use("/api/users", userRoutes);
+// Health check and diagnostics (High Priority)
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    dbStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    dbName: mongoose.connection.name,
+    timestamp: new Date().toISOString()
+  });
+});
 
-// Health check and diagnostics
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
@@ -59,17 +61,29 @@ app.get("/api/health", (req, res) => {
 
 app.get("/api/diag", async (req, res) => {
   try {
-    const collections = await mongoose.connection.db.listCollections().toArray();
+    const connected = mongoose.connection.readyState === 1;
+    let collections = [];
+    if (connected) {
+      collections = await mongoose.connection.db.listCollections().toArray();
+    }
     res.json({
-      connected: mongoose.connection.readyState === 1,
+      connected,
       dbName: mongoose.connection.name,
       collections: collections.map(c => c.name),
-      uri_start: MONGO_URI.substring(0, 20)
+      uri_start: MONGO_URI.substring(0, 25) + "..."
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Routes
+app.use("/api/groups", groupRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/players", playerRoutes);
+app.use("/api/matches", matchRoutes);
+app.use("/api/sponsors", sponsorRoutes);
+app.use("/api/users", userRoutes);
 
 // Root route
 app.get("/", (req, res) => {
