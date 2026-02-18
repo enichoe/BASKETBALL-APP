@@ -30,39 +30,47 @@ if (!MONGO_URI.startsWith("mongodb://") && !MONGO_URI.startsWith("mongodb+srv://
   MONGO_URI = "mongodb+srv://programadorwebernesto_db_user:EQsLL21GY6cebQB0@cluster0.v7wrefs.mongodb.net/basket_league_app?appName=Cluster0";
 }
 
-console.log("Intentando conectar a MongoDB...");
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected successfully");
-    console.log("📍 Database name:", mongoose.connection.name);
-  })
-  .catch(err => {
-    console.error("❌ MongoDB connection error:", err.message);
-    console.error("🔍 Tip: Verifica el Whitelist de IP en MongoDB Atlas (añadir 0.0.0.0/0 para Render).");
-    console.log("URI intentada (ofuscada):", MONGO_URI.substring(0, 25) + "...");
-  });
-
+// Routes imports
 const groupRoutes = require("./routes/groupRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const playerRoutes = require("./routes/playerRoutes");
 const matchRoutes = require("./routes/matchRoutes");
 const sponsorRoutes = require("./routes/sponsorRoutes");
-
-// Basic route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+const userRoutes = require("./routes/userRoutes");
 
 // Routes
 app.use("/api/groups", groupRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/players", playerRoutes);
-
 app.use("/api/matches", matchRoutes);
 app.use("/api/sponsors", sponsorRoutes);
-app.use("/api/users", require("./routes/userRoutes")); // Ruta de usuarios necesaria para login
+app.use("/api/users", userRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Root route
+app.get("/", (req, res) => {
+  res.send("API is running...");
 });
+
+// Connect to MongoDB and then start server
+console.log("Intentando conectar a MongoDB...");
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected successfully");
+    console.log("📍 Database name:", mongoose.connection.name);
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("❌ CRITICAL: MongoDB connection failed:", err.message);
+    console.error("🔍 Tip: Verifica el Whitelist de IP en MongoDB Atlas (añadir 0.0.0.0/0 para Render).");
+    console.error("🔍 Tip: Verifica que la variable MONGODB_URI sea correcta en Render.");
+    
+    // In production, exit if DB connection fails so the orchestrator can restart the service
+    setTimeout(() => {
+      if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+      }
+    }, 5000);
+  });
