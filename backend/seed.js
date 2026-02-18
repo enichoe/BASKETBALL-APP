@@ -31,6 +31,7 @@ const seedData = async () => {
         await Player.deleteMany({});
         await Match.deleteMany({});
         await Sponsor.deleteMany({});
+        await User.deleteMany({}); // Añadido para evitar error de duplicado
 
         console.log("Creando datos de ejemplo...");
 

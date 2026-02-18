@@ -22,7 +22,7 @@ const handleResponse = async (response) => {
   }
   const text = await response.text();
   console.error("Expected JSON but got:", text.substring(0, 100));
-  throw new Error("El servidor devolvió un formato inesperado (HTML en lugar de JSON). Verifica la URL de la API.");
+  throw new Error("El servidor devolvió un formato inesperado. Verifica que el backend esté corriendo correctamente.");
 };
 
 export const apiService = {

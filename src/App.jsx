@@ -16,9 +16,12 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [selectedMatch, setSelectedMatch] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
+      setError(null);
+      setLoading(true);
       try {
         const [groups, teams, players, matches, sponsors] = await Promise.all([
           apiService.getGroups(),
@@ -30,6 +33,7 @@ export default function App() {
         setData({ groups, teams, players, matches, sponsors });
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError("Error al cargar los datos del servidor. Por favor, asegúrate de que el backend esté ejecutándose.");
       } finally {
         setLoading(false);
       }
@@ -77,9 +81,17 @@ export default function App() {
 
   const renderNav = () => {
     return (
-      <nav className='bg-gray-800 text-gray-100 p-4 flex justify-between items-center shadow-md'>
-        <h1 className='text-xl font-bold cursor-pointer hover:text-indigo-400 transition-colors' onClick={() => { setView('public'); setSelectedTeam(null); setSelectedMatch(null) }}>🏀 BasketLeagueApp</h1>
-        {view !== 'admin' && <button onClick={() => setView('login')} className='btn-secondary'>Admin Login</button>}
+      <nav className='bg-gray-800 text-gray-100 p-4 flex flex-col shadow-md'>
+        <div className='flex justify-between items-center w-full'>
+          <h1 className='text-xl font-bold cursor-pointer hover:text-indigo-400 transition-colors' onClick={() => { setView('public'); setSelectedTeam(null); setSelectedMatch(null) }}>🏀 BasketLeagueApp</h1>
+          {view !== 'admin' && <button onClick={() => setView('login')} className='btn-secondary'>Admin Login</button>}
+        </div>
+        {error && (
+          <div className='mt-3 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-200 text-sm flex items-center justify-between'>
+            <span>⚠️ {error}</span>
+            <button onClick={() => window.location.reload()} className='underline font-bold hover:text-white transition-colors'>Reintentar</button>
+          </div>
+        )}
       </nav>
     )
   }
