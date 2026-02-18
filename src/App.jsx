@@ -19,6 +19,12 @@ export default function App() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    // Restaurar sesión si hay token
+    const token = localStorage.getItem('token');
+    if (token) {
+      setView('admin');
+    }
+
     const fetchData = async () => {
       setError(null);
       setLoading(true);
@@ -51,9 +57,13 @@ export default function App() {
 
   const login = async (user, pass) => {
     try {
-      await apiService.login(user, pass);
-      setView('admin');
-      return true;
+      const response = await apiService.login(user, pass);
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        setView('admin');
+        return true;
+      }
+      return false;
     } catch (error) {
       alert(error.message);
       return false;
@@ -61,6 +71,7 @@ export default function App() {
   }
 
   const logout = () => {
+    localStorage.removeItem('token');
     setView('public');
   }
 
