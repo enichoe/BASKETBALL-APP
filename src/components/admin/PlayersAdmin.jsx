@@ -32,7 +32,7 @@ export default function PlayersAdmin({ data, onSave }) {
       nombre: form.nombre,
       edad: Number(form.edad),
       posicion: form.posicion,
-      equipo: form.equipoId, // API expects 'equipo'
+      equipo: form.equipoId, // Cambiado equipoId -> equipo para coincidir con el schema
       image: form.foto || 'assets/players/default.svg',
       puntos: parseInt(form.puntos) || 0,
       rebotes: parseInt(form.rebotes) || 0,

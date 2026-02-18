@@ -36,7 +36,17 @@ export default function App() {
           apiService.getMatches(),
           apiService.getSponsors()
         ]);
-        setData({ groups, teams, players, matches, sponsors });
+
+        // Normalizar IDs de MongoDB (_id -> id)
+        const normalize = (arr) => arr.map(item => ({ ...item, id: item._id }));
+
+        setData({
+          groups: normalize(groups),
+          teams: normalize(teams),
+          players: normalize(players),
+          matches: normalize(matches),
+          sponsors: normalize(sponsors)
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Error al cargar los datos del servidor. Por favor, asegúrate de que el backend esté ejecutándose.");
@@ -84,7 +94,16 @@ export default function App() {
         apiService.getMatches(),
         apiService.getSponsors()
       ]);
-      setData({ groups, teams, players, matches, sponsors });
+
+      const normalize = (arr) => arr.map(item => ({ ...item, id: item._id }));
+
+      setData({
+        groups: normalize(groups),
+        teams: normalize(teams),
+        players: normalize(players),
+        matches: normalize(matches),
+        sponsors: normalize(sponsors)
+      });
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
