@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { apiService } from '../../services/api';
 
 export default function SponsorsAdmin({ data, onSave }) {
   const [sponsors, setSponsors] = useState(data.sponsors || []);
   const [newSponsor, setNewSponsor] = useState({
-    id: '',
     nombre: '',
     logo: '',
     link: '',
@@ -15,40 +15,49 @@ export default function SponsorsAdmin({ data, onSave }) {
     setNewSponsor({ ...newSponsor, [name]: value });
   };
 
-  const generateId = () => {
-    return 's' + Math.random().toString(36).substr(2, 9);
-  };
-
-  const handleAddSponsor = () => {
+  const handleAddSponsor = async () => {
     if (newSponsor.nombre && newSponsor.logo) {
-      const updatedSponsors = [...sponsors, { ...newSponsor, id: generateId() }];
-      setSponsors(updatedSponsors);
-      onSave({ ...data, sponsors: updatedSponsors });
-      setNewSponsor({ id: '', nombre: '', logo: '', link: '' });
+      try {
+        await apiService.createSponsor(newSponsor);
+        onSave();
+        setNewSponsor({ nombre: '', logo: '', link: '' });
+      } catch (error) {
+        alert(error.message);
+      }
     }
   };
 
   const handleEditClick = (sponsor) => {
     setEditingSponsorId(sponsor.id);
-    setNewSponsor({ ...sponsor });
+    setNewSponsor({
+      nombre: sponsor.nombre,
+      logo: sponsor.logo,
+      link: sponsor.link || ''
+    });
   };
 
-  const handleUpdateSponsor = () => {
+  const handleUpdateSponsor = async () => {
     if (newSponsor.nombre && newSponsor.logo && editingSponsorId) {
-      const updatedSponsors = sponsors.map((s) =>
-        s.id === editingSponsorId ? { ...newSponsor } : s
-      );
-      setSponsors(updatedSponsors);
-      onSave({ ...data, sponsors: updatedSponsors });
-      setNewSponsor({ id: '', nombre: '', logo: '', link: '' });
-      setEditingSponsorId(null);
+      try {
+        await apiService.updateSponsor(editingSponsorId, newSponsor);
+        onSave();
+        setNewSponsor({ nombre: '', logo: '', link: '' });
+        setEditingSponsorId(null);
+      } catch (error) {
+        alert(error.message);
+      }
     }
   };
 
-  const handleDeleteSponsor = (id) => {
-    const updatedSponsors = sponsors.filter((s) => s.id !== id);
-    setSponsors(updatedSponsors);
-    onSave({ ...data, sponsors: updatedSponsors });
+  const handleDeleteSponsor = async (id) => {
+    if (window.confirm('¿Eliminar auspiciador?')) {
+      try {
+        await apiService.deleteSponsor(id);
+        onSave();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
   };
 
   return (

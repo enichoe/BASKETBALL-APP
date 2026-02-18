@@ -32,7 +32,7 @@ export default function PlayersAdmin({ data, onSave }) {
       nombre: form.nombre,
       edad: Number(form.edad),
       posicion: form.posicion,
-      equipo: form.equipoId, // Cambiado equipoId -> equipo para coincidir con el schema
+      equipo: form.equipoId,
       image: form.foto || 'assets/players/default.svg',
       puntos: parseInt(form.puntos) || 0,
       rebotes: parseInt(form.rebotes) || 0,
@@ -57,7 +57,11 @@ export default function PlayersAdmin({ data, onSave }) {
 
   const startEdit = (player) => {
     setEditingId(player.id)
-    setForm(player)
+    // Aseguramos que equipoId esté presente
+    setForm({
+      ...player,
+      equipoId: player.equipo?._id || player.equipoId || player.equipo
+    })
   }
 
   const cancelEdit = () => {

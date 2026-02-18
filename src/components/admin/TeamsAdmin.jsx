@@ -22,7 +22,7 @@ export default function TeamsAdmin({ data, onSave }) {
   const add = async () => {
     if (!name || !grupoId) return
     try {
-      await apiService.createTeam({ nombre: name, logo: logo || 'assets/logos/default.svg', color: color, grupoId: grupoId })
+      await apiService.createTeam({ nombre: name, logo: logo || 'assets/logos/default.svg', color: color, grupo: grupoId })
       onSave() // Refresh data in App.jsx
       setName('')
       setColor('#000000')
@@ -58,16 +58,19 @@ export default function TeamsAdmin({ data, onSave }) {
     setLogo('')
   }
 
-  const handleUpdate = () => {
-    const updatedTeams = teams.map(t =>
-      t.id === editingTeamId
-        ? { ...t, nombre: name, color: color, logo: logo, grupoId: grupoId }
-        : t
-    )
-    const next = { ...data, teams: updatedTeams }
-    setTeams(updatedTeams)
-    onSave(next)
-    cancelEdit()
+  const handleUpdate = async () => {
+    try {
+      await apiService.updateTeam(editingTeamId, {
+        nombre: name,
+        color: color,
+        logo: logo,
+        grupo: grupoId
+      })
+      onSave()
+      cancelEdit()
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
   if (editingTeamId) {

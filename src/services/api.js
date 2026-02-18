@@ -86,6 +86,20 @@ export const apiService = {
 
   // Sponsors
   getSponsors: () => fetch(`${API_URL}/sponsors`).then(handleResponse),
+  createSponsor: (data) => fetch(`${API_URL}/sponsors`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+  updateSponsor: (id, data) => fetch(`${API_URL}/sponsors/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+  deleteSponsor: (id) => fetch(`${API_URL}/sponsors/${id}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeader() }
+  }).then(handleResponse),
   
   // Auth
   login: (user, pass) => fetch(`${API_URL}/users/login`, {

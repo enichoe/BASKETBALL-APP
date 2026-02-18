@@ -39,11 +39,22 @@ export default function App() {
 
         // Normalizar IDs de MongoDB (_id -> id)
         const normalize = (arr) => arr.map(item => ({ ...item, id: item._id }));
+        const normalizePlayers = (arr) => arr.map(item => ({
+          ...item,
+          id: item._id,
+          equipoId: item.equipo?._id || item.equipo,
+          foto: item.image // Mapear image (DB) a foto (Frontend)
+        }));
+        const normalizeTeams = (arr) => arr.map(item => ({
+          ...item,
+          id: item._id,
+          grupoId: item.grupo?._id || item.grupo
+        }));
 
         setData({
           groups: normalize(groups),
-          teams: normalize(teams),
-          players: normalize(players),
+          teams: normalizeTeams(teams),
+          players: normalizePlayers(players),
           matches: normalize(matches),
           sponsors: normalize(sponsors)
         });
@@ -96,11 +107,22 @@ export default function App() {
       ]);
 
       const normalize = (arr) => arr.map(item => ({ ...item, id: item._id }));
+      const normalizePlayers = (arr) => arr.map(item => ({
+        ...item,
+        id: item._id,
+        equipoId: item.equipo?._id || item.equipo,
+        foto: item.image
+      }));
+      const normalizeTeams = (arr) => arr.map(item => ({
+        ...item,
+        id: item._id,
+        grupoId: item.grupo?._id || item.grupo
+      }));
 
       setData({
         groups: normalize(groups),
-        teams: normalize(teams),
-        players: normalize(players),
+        teams: normalizeTeams(teams),
+        players: normalizePlayers(players),
         matches: normalize(matches),
         sponsors: normalize(sponsors)
       });
