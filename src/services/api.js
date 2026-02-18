@@ -1,6 +1,17 @@
-let API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
+let API_URL = (import.meta.env.VITE_API_URL || '').trim();
+
+// Fallback automático si no hay variable de entorno
+if (!API_URL) {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        API_URL = 'http://localhost:5000/api';
+    } else {
+        // Tu URL de Render real como fallback final
+        API_URL = 'https://basketball-app-1.onrender.com/api';
+    }
+}
+
 if (API_URL.endsWith('/') || API_URL.endsWith('.')) API_URL = API_URL.slice(0, -1);
-if (API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1); // Handle both dot and slash
+if (API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1);
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
