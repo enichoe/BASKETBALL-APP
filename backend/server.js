@@ -46,6 +46,31 @@ app.use("/api/matches", matchRoutes);
 app.use("/api/sponsors", sponsorRoutes);
 app.use("/api/users", userRoutes);
 
+// Health check and diagnostics
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    dbStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    dbName: mongoose.connection.name,
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get("/api/diag", async (req, res) => {
+  try {
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    res.json({
+      connected: mongoose.connection.readyState === 1,
+      dbName: mongoose.connection.name,
+      collections: collections.map(c => c.name),
+      uri_start: MONGO_URI.substring(0, 20)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Root route
 app.get("/", (req, res) => {
   res.send("API is running...");
